@@ -3,12 +3,13 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import fire
 
 
-def visualize_rubiks_cube(cube_config):
+def visualize_rubiks_cube(cube_config, ax=None):
     if len(cube_config) != 54:
         raise ValueError("The cube configuration must be exactly 54 characters long.")
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
 
     # Define color mapping
     color_map = {
@@ -48,6 +49,9 @@ def visualize_rubiks_cube(cube_config):
                 color_char = face_config[i*3 + j]
                 face_colors.append(color_map[color_char])
 
+    # Clear the existing plot
+    ax.clear()
+
     # Plot each face
     for face, color in zip(faces, face_colors):
         poly3d = [[tuple(vertex) for vertex in face]]
@@ -64,10 +68,14 @@ def visualize_rubiks_cube(cube_config):
     ax.set_ylim([0, 3])
     ax.set_zlim([0, 3])
 
-    plt.show()
+    if ax is None:
+        plt.show()
 
 def main(cube_config='wowgybbwygyoybyogwwgrorwrbygorrggobrbwororbwbgygowryby'):
-    visualize_rubiks_cube(cube_config)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    visualize_rubiks_cube(cube_config, ax)
+    plt.show()
 
 if __name__ == '__main__':
     fire.Fire(main)
