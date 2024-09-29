@@ -66,7 +66,7 @@ def visualize_rubiks_cube(cube_config):
 
     plt.show()
 
-def main(cube_config='wowgybwyogygybyoggrowbrgywrborwggybrbwororbwborgowryby'):
+def main(cube_config='wowgybbwygyoybyogwwgrorwrbygorrggobrbwororbwbgygowryby'):
     visualize_rubiks_cube(cube_config)
 
 if __name__ == '__main__':
