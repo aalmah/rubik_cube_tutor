@@ -1,8 +1,10 @@
 import cv2
 import tkinter as tk
-from tkinter import Label, Canvas, Frame
+from tkinter import ttk, Label, Canvas, Frame
 from PIL import Image, ImageTk
 from cv_analyze_cube import analyze_rubiks_cube
+import subprocess
+import sys
 
 class CubeCaptureApp:
     def __init__(self, root):
@@ -151,6 +153,19 @@ class CubeCaptureApp:
         # Reduce update frequency
         self.update_interval = 50  # 20 FPS instead of 30
         self.update_frame()
+        
+        # Add solve button at the bottom (initially disabled)
+        self.solve_button = ttk.Button(
+            self.frame,
+            text="Start Solving",
+            command=self.launch_solver,
+            state='disabled'
+        )
+        self.solve_button.pack(pady=10)
+        
+        # Bind entry changes to check completion
+        for entry in self.side_entries:
+            entry.bind('<KeyRelease>', self.check_entries_complete)
     
     def update_frame(self):
         ret, frame = self.cap.read()
@@ -209,6 +224,23 @@ class CubeCaptureApp:
             except Exception as e:
                 self.result_text.config(text=f"Error analyzing cube: {e}")
     
+    def check_entries_complete(self, event=None):
+        # Enable solve button if all entries are filled
+        if all(entry.get() for entry in self.side_entries):
+            self.solve_button.config(state='normal')
+        else:
+            self.solve_button.config(state='disabled')
+    
+    def launch_solver(self):
+        # Get all sides in the correct order
+        cube_string = ''.join(entry.get() for entry in self.side_entries)
+        
+        # Launch the solver with the cube string as an argument
+        subprocess.Popen([sys.executable, 'rubiks_tutor.py', cube_string])
+        
+        # Optionally close the capture window
+        self.root.destroy()
+
     def __del__(self):
         if self.cap.isOpened():
             self.cap.release()
