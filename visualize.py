@@ -71,7 +71,7 @@ def visualize_rubiks_cube(cube_config, ax=None):
     if ax is None:
         plt.show()
 
-def main(cube_config='wowgybbwygyoybyogwwgrorwrbygorrggobrbwororbwbgygowryby'):
+def main(cube_config='wowgybwyogygybyoggrowbrgywrborwggybrbwororbwborgowryby'):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     visualize_rubiks_cube(cube_config, ax)
