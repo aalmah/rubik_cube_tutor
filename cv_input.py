@@ -8,7 +8,8 @@ class CubeCaptureApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Rubik's Cube Capture")
-        self.root.geometry("750x600")  # Increase GUI size to fit both views
+        self.root.geometry("800x600")  # Smaller window
+        self.root.configure(bg="#f0f0f0")
         
         # Try different camera indices until we find one that works
         self.cap = None
@@ -25,41 +26,80 @@ class CubeCaptureApp:
         if self.cap is None:
             raise RuntimeError("No working camera found!")
         
-        self.frame = Frame(self.root, bg="lightgray")
-        self.frame.pack(fill=tk.BOTH, expand=True)
+        self.frame = Frame(self.root, bg="#f0f0f0")
+        self.frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
         
-        self.instruction_label = Label(self.frame, text="Align the Rubik's Cube in the correct color square and press Enter to Capture.", bg="lightgray", font=("Arial", 12))
-        self.instruction_label.pack(pady=10)
+        # Title with compact styling
+        title_label = Label(self.frame, 
+                          text="Rubik's Cube Scanner", 
+                          bg="#f0f0f0", 
+                          font=("Arial", 20, "bold"),
+                          fg="#2c3e50")
+        title_label.pack(pady=(0, 10))
         
-        self.canvas_frame = Frame(self.frame)
-        self.canvas_frame.pack()
+        self.instruction_label = Label(self.frame, 
+                                     text="Align cube and press Enter to capture", 
+                                     bg="#f0f0f0", 
+                                     font=("Arial", 11),
+                                     fg="#34495e")
+        self.instruction_label.pack(pady=(0, 10))
+        
+        # Camera views side by side
+        self.canvas_frame = Frame(self.frame, bg="#f0f0f0")
+        self.canvas_frame.pack(pady=5)
         
         # Camera view
-        self.camera_label = Label(self.canvas_frame, text="Live Camera View (Place cube in BLUE box)", font=("Arial", 10), bg="blue", fg="white")
-        self.camera_label.grid(row=0, column=0, pady=5)
+        camera_container = Frame(self.canvas_frame, bg="#f0f0f0")
+        camera_container.grid(row=0, column=0, padx=10)
         
-        self.canvas = Canvas(self.canvas_frame, width=300, height=300, bg="black", highlightbackground="blue", highlightthickness=5)
-        self.canvas.grid(row=1, column=0, padx=10)
+        self.camera_label = Label(camera_container, 
+                                text="Live Camera", 
+                                font=("Arial", 10, "bold"),
+                                bg="#3498db",
+                                fg="white",
+                                pady=3,
+                                padx=10)
+        self.camera_label.pack(pady=(0, 3))
         
-        # Captured image view
-        self.captured_label = Label(self.canvas_frame, text="Captured Image (Captured in GREEN box)", font=("Arial", 10), bg="green", fg="white")
-        self.captured_label.grid(row=0, column=1, pady=5)
+        self.canvas = Canvas(camera_container, 
+                           width=300, height=300,
+                           bg="black",
+                           highlightbackground="#3498db",
+                           highlightthickness=2)
+        self.canvas.pack()
         
-        self.captured_canvas = Canvas(self.canvas_frame, width=300, height=300, bg="white", highlightbackground="green", highlightthickness=5)
-        self.captured_canvas.grid(row=1, column=1, padx=10)
+        # Captured view
+        captured_container = Frame(self.canvas_frame, bg="#f0f0f0")
+        captured_container.grid(row=0, column=1, padx=10)
         
-        # Add result display area
-        self.result_label = Label(self.frame, text="Analysis Results:", font=("Arial", 12), bg="lightgray")
-        self.result_label.pack(pady=5)
+        self.captured_label = Label(captured_container,
+                                  text="Captured",
+                                  font=("Arial", 10, "bold"),
+                                  bg="#27ae60",
+                                  fg="white",
+                                  pady=3,
+                                  padx=10)
+        self.captured_label.pack(pady=(0, 3))
         
-        self.result_text = Label(self.frame, text="No cube analyzed yet", font=("Arial", 10), bg="lightgray")
-        self.result_text.pack()
+        self.captured_canvas = Canvas(captured_container,
+                                    width=300, height=300,
+                                    bg="white",
+                                    highlightbackground="#27ae60",
+                                    highlightthickness=2)
+        self.captured_canvas.pack()
         
-        # Add frame for cube side inputs
-        self.sides_frame = Frame(self.frame, bg="lightgray")
-        self.sides_frame.pack(pady=10)
+        # Results section
+        self.result_text = Label(self.frame,
+                               text="No cube analyzed yet",
+                               font=("Arial", 10),
+                               bg="#f0f0f0",
+                               fg="#7f8c8d")
+        self.result_text.pack(pady=5)
         
-        # Create text entries for each cube side
+        # Side entries in two columns
+        self.sides_frame = Frame(self.frame, bg="#f0f0f0")
+        self.sides_frame.pack(pady=5)
+        
         self.side_entries = []
         side_labels = [
             "Yellow side (orange top)",
@@ -70,72 +110,98 @@ class CubeCaptureApp:
             "White side (red top)"
         ]
         
-        self.selected_entry_index = 0  # Track which entry is currently selected
+        self.selected_entry_index = 0
         
+        # Create entries in 2 columns
         for i, label in enumerate(side_labels):
-            side_frame = Frame(self.sides_frame, bg="lightgray")
-            side_frame.pack(pady=2)
+            row = i % 3
+            col = i // 3
             
-            Label(side_frame, text=label, bg="lightgray", font=("Arial", 10)).pack(side=tk.LEFT, padx=5)
-            entry = tk.Entry(side_frame, width=20)
+            side_frame = Frame(self.sides_frame, bg="#f0f0f0")
+            side_frame.grid(row=row, column=col, pady=2, padx=5)
+            
+            Label(side_frame,
+                 text=label,
+                 bg="#f0f0f0",
+                 font=("Arial", 10),
+                 width=18,
+                 anchor='e').pack(side=tk.LEFT, padx=5)
+            
+            entry = tk.Entry(side_frame,
+                           width=15,
+                           font=("Arial", 10),
+                           relief="solid",
+                           bd=1)
             entry.pack(side=tk.LEFT)
             entry.bind('<FocusIn>', lambda e, idx=i: self.on_entry_select(idx))
             self.side_entries.append(entry)
         
-        # Highlight the first entry by default
-        self.side_entries[0].config(bg='lightblue')
+        # Highlight first entry
+        self.side_entries[0].config(bg='#e8f0fe')
         
-        self.root.bind("<Return>", self.capture_image)  # Bind Enter key to capture function
+        shortcut_label = Label(self.frame,
+                             text="Press Enter to capture",
+                             font=("Arial", 9, "italic"),
+                             bg="#f0f0f0",
+                             fg="#95a5a6")
+        shortcut_label.pack(pady=5)
         
+        self.root.bind("<Return>", self.capture_image)
+        
+        # Reduce update frequency
+        self.update_interval = 50  # 20 FPS instead of 30
         self.update_frame()
     
     def update_frame(self):
         ret, frame = self.cap.read()
         if ret:
+            # Resize first to reduce processing load
+            frame = cv2.resize(frame, (300, 300))
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = cv2.resize(frame, (300, 300))  # Resize frame to match canvas
-            img = Image.fromarray(frame)
-            imgtk = ImageTk.PhotoImage(image=img)
-            self.canvas.delete("all")  # Clear previous frame before updating
-            self.canvas.create_image(150, 150, image=imgtk)
-            self.canvas.imgtk = imgtk
+            
+            # Convert directly to PhotoImage without using PIL unless necessary
+            img_tk = ImageTk.PhotoImage(image=Image.fromarray(frame))
+            self.canvas.delete("all")
+            self.canvas.create_image(150, 150, image=img_tk)
+            self.canvas.img_tk = img_tk  # Keep reference to prevent garbage collection
         
-        self.root.after(33, self.update_frame)  # Update at ~30 FPS
+        self.root.after(self.update_interval, self.update_frame)
     
     def on_entry_select(self, index):
         # Reset background of all entries
         for entry in self.side_entries:
             entry.config(bg='white')
-        # Highlight selected entry
-        self.side_entries[index].config(bg='lightblue')
+        # Highlight selected entry with a softer blue
+        self.side_entries[index].config(bg='#e8f0fe')
         self.selected_entry_index = index
 
     def capture_image(self, event=None):
         ret, frame = self.cap.read()
         if ret:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            # Process captured image
             frame = cv2.resize(frame, (300, 300))
-            img = Image.fromarray(frame)
-            img.save("captured_cube.jpg")
-            print("Image captured and saved as 'captured_cube.jpg'")
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             
-            imgtk = ImageTk.PhotoImage(image=img)
+            # Only save if needed for analysis
+            img = Image.fromarray(frame)
+            
+            # Update display
+            img_tk = ImageTk.PhotoImage(image=img)
             self.captured_canvas.delete("all")
-            self.captured_canvas.create_image(150, 150, image=imgtk)
-            self.captured_canvas.imgtk = imgtk
+            self.captured_canvas.create_image(150, 150, image=img_tk)
+            self.captured_canvas.img_tk = img_tk
             
             # Analyze the cube and display results
             try:
                 grid = analyze_rubiks_cube(img)
-                # Convert grid to sequence of first letters
-                color_sequence = ''.join(color[0].upper() for row in grid for color in row)
+                color_sequence = ''.join(color[0].lower() for row in grid for color in row)
                 self.result_text.config(text=f"Cube colors: {color_sequence}")
                 
-                # Update the selected entry with the color sequence
+                # Update the selected entry
                 self.side_entries[self.selected_entry_index].delete(0, tk.END)
                 self.side_entries[self.selected_entry_index].insert(0, color_sequence)
                 
-                # Move selection to next entry if not at the last one
+                # Move to next entry if possible
                 if self.selected_entry_index < 5:
                     next_index = self.selected_entry_index + 1
                     self.on_entry_select(next_index)
