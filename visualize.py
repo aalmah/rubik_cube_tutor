@@ -36,7 +36,7 @@ def visualize_rubiks_cube(cube_config, ax=None):
                 if face_idx == 0:  # Top face
                     faces.append([[j, 2-i, 3], [j+1, 2-i, 3], [j+1, 3-i, 3], [j, 3-i, 3]])
                 elif face_idx == 1:  # Left face
-                    faces.append([[0, j, 2-i], [0, j, 3-i], [0, j+1, 3-i], [0, j+1, 2-i]])
+                    faces.append([[0, 3-j, 2-i], [0, 3-j, 3-i], [0, 2-j, 3-i], [0, 2-j, 2-i]])
                 elif face_idx == 2:  # Front face
                     faces.append([[j, 0, 2-i], [j+1, 0, 2-i], [j+1, 0, 3-i], [j, 0, 3-i]])
                 elif face_idx == 3:  # Right face

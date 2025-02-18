@@ -72,6 +72,7 @@ class RubiksSolverGUI:
         
         # Initialize with provided cube string if available
         if cube_string:
+            print("solving cube: ", cube_string)
             self.cube_string = cube_string
             self.solve_button = ttk.Button(main_frame, text="Solve", command=self.solve_cube)
             self.solve_button.pack(pady=5)
